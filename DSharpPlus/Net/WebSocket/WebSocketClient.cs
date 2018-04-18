@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -50,6 +52,11 @@ namespace DSharpPlus.Net.WebSocket
         /// <returns></returns>
         public override async Task ConnectAsync(Uri uri)
         {
+            await ConnectAsync(uri, null);
+        }
+
+        public override async Task ConnectAsync(Uri uri, Dictionary<string, string> headers)
+        {
             this.SocketMessageQueue = new ConcurrentQueue<string>();
             this.TokenSource = new CancellationTokenSource();
 
@@ -65,6 +72,10 @@ namespace DSharpPlus.Net.WebSocket
             this.Socket.Options.KeepAliveInterval = TimeSpan.FromSeconds(20);
             if (this.Proxy != null) // because mono doesn't implement this properly
                 this.Socket.Options.Proxy = this.Proxy;
+
+            if (headers != null) 
+                foreach(var header in headers)
+                    this.Socket.Options.SetRequestHeader(header.Key, header.Value);
 
             await Socket.ConnectAsync(uri, this.Token).ConfigureAwait(false);
             await OnConnectedAsync().ConfigureAwait(false);
