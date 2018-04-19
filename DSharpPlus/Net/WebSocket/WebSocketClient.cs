@@ -55,7 +55,7 @@ namespace DSharpPlus.Net.WebSocket
             await ConnectAsync(uri, null);
         }
 
-        public override async Task ConnectAsync(Uri uri, Dictionary<string, string> headers)
+        public async Task ConnectAsync(Uri uri, Dictionary<string, string> headers)
         {
             this.SocketMessageQueue = new ConcurrentQueue<string>();
             this.TokenSource = new CancellationTokenSource();
