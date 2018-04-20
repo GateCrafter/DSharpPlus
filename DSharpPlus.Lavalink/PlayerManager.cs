@@ -40,8 +40,10 @@ namespace DSharpPlus.Lavalink
             var node = new LavalinkNode(this, options);
 
             node.OnError += (sender, e) => this.Client.EventErrorHandler("", e.Error);
-            node.OnDisconnect += (sender, e) => {
-                if (this.Nodes.Count != 0) {
+            node.OnDisconnect += (sender, e) =>
+            {
+                if (this.Nodes.Count != 0)
+                {
                     Console.WriteLine("[Lavalink] - No available voice nodes.");
                     return;
                 }
@@ -66,7 +68,7 @@ namespace DSharpPlus.Lavalink
             JToken op = null;
             if (data == null || !data.TryGetValue("op", out op))
                 return false;
-            switch(op.ToString())
+            switch (op.ToString())
             {
                 case "event":
                     var player = this[(ulong)data["guildId"]];
@@ -96,7 +98,8 @@ namespace DSharpPlus.Lavalink
             var vsj = JsonConvert.SerializeObject(vsd, Formatting.None);
             this.Client._webSocketClient.SendMessage(vsj);
 
-            return this.Add(new PlayerOptions() {
+            return this.Add(new PlayerOptions()
+            {
                 GuildId = guildId,
                 Client = this.Client,
                 ChannelId = channelId
@@ -129,23 +132,28 @@ namespace DSharpPlus.Lavalink
 
         private Task DiscordClient_VoiceStateUpdated(EventArgs.VoiceStateUpdateEventArgs e)
         {
-            this.SessionId = e.SessionId;
-            return Task.CompletedTask;
+            return Task.Run(() =>
+            {
+                this.SessionId = e.SessionId;
+            });
         }
 
-       private Task DiscordClient_VoiceServerUpdated(EventArgs.VoiceServerUpdateEventArgs e)
+        private Task DiscordClient_VoiceServerUpdated(EventArgs.VoiceServerUpdateEventArgs e)
         {
-            if (e.Guild == null) return Task.CompletedTask;
-            Player player = null;
-            bool success = this.TryGetValue(e.Guild.Id, out player);
-            if (!success || player == null) return Task.CompletedTask;
+            return Task.Run(() =>
+            {
+                if (e.Guild == null) return;
+                Player player = null;
+                bool success = this.TryGetValue(e.Guild.Id, out player);
+                if (!success || player == null) return;
 
-            player.Connect(SessionId, new VoiceEntities.VoiceServerUpdatePayload() {
-                Endpoint = e.Endpoint,
-                GuildId = e.Guild.Id,
-                Token = e.VoiceToken
+                player.Connect(SessionId, new VoiceEntities.VoiceServerUpdatePayload()
+                {
+                    Endpoint = e.Endpoint,
+                    GuildId = e.Guild.Id,
+                    Token = e.VoiceToken
+                });
             });
-            return Task.CompletedTask;
         }
 
         public Player SpawnPlayer(ulong guildId, ulong channelId, string hostId)
@@ -157,7 +165,8 @@ namespace DSharpPlus.Lavalink
             LavalinkNode node = null;
             bool successNode = this.Nodes.TryGetValue(hostId, out node);
             if (!successNode || node == null) throw new Exception($"INVALID_HOST: No available node with {hostId}");
-            return this.Add(new PlayerOptions() {
+            return this.Add(new PlayerOptions()
+            {
                 GuildId = guildId,
                 Client = this.Client,
                 Manager = this,

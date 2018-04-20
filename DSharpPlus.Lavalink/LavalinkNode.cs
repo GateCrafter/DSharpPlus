@@ -77,11 +77,12 @@ namespace DSharpPlus.Lavalink
 
         private Task OnConnect()
         {
-            this.Ready = true;
+            return Task.Run(() => {
+                this.Ready = true;
 
             if (OnReady != null)
                 OnReady(this, System.EventArgs.Empty);
-            return Task.CompletedTask;
+            });
         }
 
         public bool Send(LavalinkDispatch data)
@@ -114,13 +115,17 @@ namespace DSharpPlus.Lavalink
 
         private Task Reconnect()
         {
-            this.ReconnectTimer = new Timer(async _ =>
+            return Task.Run(() =>
             {
-                this.RemoveAllListener();
+                this.ReconnectTimer = new Timer(async _ =>
+                {
+                    this.RemoveAllListener();
 
-                await this.Connect();
-            }, null, this.ReconnectInterval, Timeout.Infinite);
-            return Task.CompletedTask;
+                    await this.Connect();
+                }, null, this.ReconnectInterval, Timeout.Infinite);
+            });
+
+            
         }
 
         public void RemoveAllListener()
@@ -133,17 +138,20 @@ namespace DSharpPlus.Lavalink
 
         private Task Close(SocketCloseEventArgs e)
         {
+
             this.Connected = false;
             if (e.CloseCode != 1000 || e.CloseMessage != "destroy") return this.Reconnect();
-            this.WebSocket = null;
-            if (OnDisconnect != null)
-                OnDisconnect(this, new StringEventArgs(e.CloseMessage));
-            return Task.CompletedTask;
+            return Task.Run(() => {
+                this.WebSocket = null;
+                if (OnDisconnect != null)
+                    OnDisconnect(this, new StringEventArgs(e.CloseMessage));
+            });    
         }
 
         private Task Message(SocketMessageEventArgs e)
         {
-            try
+            return Task.Run(() => {
+                try
             {
                 var data = JObject.Parse(e.Message);
 
@@ -155,14 +163,15 @@ namespace DSharpPlus.Lavalink
                 if (OnError != null)
                     OnError(this, new ExceptionEventArgs(ex));
             }
-            return Task.CompletedTask;
+            });
         }
 
         private Task Error(SocketErrorEventArgs e)
         {
-            if (OnError != null)
+            return Task.Run(() => {
+                if (OnError != null)
                 OnError(this, new ExceptionEventArgs(e.Exception));
-            return Task.CompletedTask;
+            });
         }
     }
 
@@ -182,5 +191,5 @@ namespace DSharpPlus.Lavalink
         public int PlayingPlayer { get; set; }
     }
 
-    
+
 }

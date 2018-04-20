@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <Import Project="../DSharpPlus.targets" />
-
   <PropertyGroup>
     <AssemblyName>DSharpPlus.Lavalink</AssemblyName>
     <RootNamespace>DSharpPlus.Lavalink</RootNamespace>
@@ -10,15 +8,13 @@
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-
   <PropertyGroup>
     <PackageId>DSharpPlus.Lavalink</PackageId>
     <Description>Lavalink implementation for DSharpPlus.</Description>
     <PackageTags>discord discord-api bots discord-bots chat dsharp dsharpplus csharp dotnet vb-net fsharp audio voice radio music</PackageTags>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-  
   <ItemGroup>
     <ProjectReference Include="..\DSharpPlus\DSharpPlus.csproj" />
   </ItemGroup>
-  
 </Project>
